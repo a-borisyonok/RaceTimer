@@ -1,0 +1,173 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".presentation.ui.settings.SettingsFragment">
+
+    <androidx.cardview.widget.CardView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="8dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="24dp">
+
+            <TextView
+                android:id="@+id/app_settings_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="24dp"
+                android:text="@string/app_settings"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"/>
+
+            <TextView
+                android:id="@+id/theme"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="24dp"
+                android:layout_marginStart="24dp"
+                android:layout_marginTop="40dp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/app_settings_text"
+                tools:text="Day mode" />
+
+            <Switch
+                android:id="@+id/toggle_theme"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="24dp"
+                android:layout_marginStart="64dp"
+                android:layout_marginTop="16dp"
+                app:layout_constraintBottom_toTopOf="@id/race_settings_text"
+                app:layout_constraintStart_toEndOf="@id/theme"
+                app:layout_constraintTop_toBottomOf="@id/app_settings_text" />
+
+            <TextView
+                android:id="@+id/race_settings_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="24dp"
+                android:text="@string/race_settings"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/theme"/>
+
+            <TextView
+                android:id="@+id/start_open_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="24dp"
+                android:text="@string/start_open"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/race_settings_text" />
+
+
+            <TextView
+                android:id="@+id/start_open_time"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="24dp"
+                android:text="@string/_00_00_00"
+                app:layout_constraintStart_toEndOf="@id/settings_barrier"
+                app:layout_constraintTop_toBottomOf="@id/race_settings_text" />
+
+            <ImageButton
+                android:id="@+id/edit_open_time"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:layout_margin="24dp"
+                android:background="@android:color/transparent"
+                android:contentDescription="@string/app_name"
+                android:src="@drawable/ic_baseline_edit_24"
+                app:layout_constraintStart_toEndOf="@id/start_open_time"
+                app:layout_constraintTop_toBottomOf="@+id/race_settings_text" />
+
+            <TextView
+                android:id="@+id/start_close_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="24dp"
+                android:text="@string/start_close"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/start_open_text" />
+
+            <TextView
+                android:id="@+id/start_close_time"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="24dp"
+                android:text="@string/_00_00_00"
+                app:layout_constraintStart_toEndOf="@id/settings_barrier"
+                app:layout_constraintTop_toBottomOf="@id/start_open_text" />
+
+            <ImageButton
+                android:id="@+id/edit_close_time"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="24dp"
+                android:background="@android:color/transparent"
+                android:contentDescription="@string/app_name"
+                android:src="@drawable/ic_baseline_edit_24"
+                app:layout_constraintStart_toEndOf="@id/start_close_time"
+                app:layout_constraintTop_toBottomOf="@+id/start_open_text" />
+
+            <TextView
+                android:id="@+id/finish_close_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="24dp"
+                android:text="@string/finish_close"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/start_close_text" />
+
+            <TextView
+                android:id="@+id/finish_close_time"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="24dp"
+                android:text="@string/_00_00_00"
+                app:layout_constraintStart_toEndOf="@id/settings_barrier"
+                app:layout_constraintTop_toBottomOf="@id/start_close_text" />
+
+            <ImageButton
+                android:id="@+id/edit_finish_close_time"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="24dp"
+                android:background="@android:color/transparent"
+                android:contentDescription="@string/app_name"
+                android:src="@drawable/ic_baseline_edit_24"
+                app:layout_constraintStart_toEndOf="@id/finish_close_time"
+                app:layout_constraintTop_toBottomOf="@+id/start_close_time" />
+
+            <Button
+                android:id="@+id/start_timer_from_settings"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="24dp"
+                android:text="@string/show_timer"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/finish_close_time" />
+
+            <androidx.constraintlayout.widget.Barrier
+                android:id="@+id/settings_barrier"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:orientation="horizontal"
+                app:barrierDirection="end"
+                app:constraint_referenced_ids="start_open_text, start_close_text, finish_close_text" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </androidx.cardview.widget.CardView>
+</androidx.constraintlayout.widget.ConstraintLayout>

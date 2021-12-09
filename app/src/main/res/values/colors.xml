@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="purple_200">#DFDEDF</color>
+    <color name="purple_500">#8D8D8E</color>
+    <color name="purple_700">#535353</color>
+    <color name="teal_200">#FF03DAC5</color>
+    <color name="teal_700">#FF018786</color>
+    <color name="black">#FF000000</color>
+    <color name="white">#FFFFFFFF</color>
+    <color name="red">#FF0000</color>
+<color name="start_button_color">#5A875C</color>
+    <color name="finish_button_color">#8E5656</color>
+</resources>

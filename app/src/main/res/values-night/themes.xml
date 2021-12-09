@@ -1,0 +1,18 @@
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <!-- Base application theme. -->
+    <style name="Theme.RaceTimer" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+        <!-- Primary brand color. -->
+        <item name="colorPrimary">#AAAAAA</item>
+        <item name="colorPrimaryVariant">#858484</item>
+        <item name="colorOnPrimary">#DAD9D9</item>
+        <!-- Secondary brand color. -->
+        <item name="colorSecondary">@color/teal_200</item>
+        <item name="colorSecondaryVariant">#3A3A3A</item>
+        <item name="colorOnSecondary">@color/black</item>
+        <!-- Status bar color. -->
+        <item name="android:statusBarColor" tools:targetApi="l">?attr/colorSecondaryVariant</item>
+
+        <!-- Customize your theme here. -->
+        <item name="android:windowBackground">@drawable/background_dark</item>
+    </style>
+</resources>
