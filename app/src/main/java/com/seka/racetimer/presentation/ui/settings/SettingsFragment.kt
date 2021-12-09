@@ -38,8 +38,8 @@ class SettingsFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        val preferredTheme = sharedPreferences.getBoolean(THEME_PREFERENCES, false)
-        if (preferredTheme) {
+        val preferredTheme = sharedPreferences.getString(THEME_PREFERENCES, "")
+        if (preferredTheme == "night") {
             AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
         } else {
             AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
@@ -57,7 +57,7 @@ class SettingsFragment : Fragment() {
                 }
             }
 
-            if (preferredTheme) toggleTheme.isChecked = true
+            if (preferredTheme == "night") toggleTheme.isChecked = true
             theme.text = getString(R.string.dark_mode_text)
 
             toggleTheme.setOnClickListener {
@@ -67,13 +67,13 @@ class SettingsFragment : Fragment() {
 
                         AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
                         toggleTheme.isActivated = true
-                        sharedPreferences.edit().putBoolean(THEME_PREFERENCES, false).apply()
+                        sharedPreferences.edit().putString(THEME_PREFERENCES, "day").apply()
                     }
                     Configuration.UI_MODE_NIGHT_NO -> {
 
                         AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
                         toggleTheme.isActivated = false
-                        sharedPreferences.edit().putBoolean(THEME_PREFERENCES, true).apply()
+                        sharedPreferences.edit().putString(THEME_PREFERENCES, "night").apply()
                     }
                 }
             }
