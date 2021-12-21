@@ -4,11 +4,13 @@ import java.text.SimpleDateFormat
 import java.util.*
 
 class TimeMillisConverter {
+
      fun convertMillisToTime(time: Long): String {
         val date = Date(time)
         val format = SimpleDateFormat("HH:mm:ss", Locale.getDefault())
         return format.format(date)
     }
+
      fun convertRaceDurationToTime(duration: Long): String {
 
         val seconds = ((duration / 1000) % 60)

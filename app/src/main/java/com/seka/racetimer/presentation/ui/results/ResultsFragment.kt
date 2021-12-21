@@ -18,36 +18,38 @@ import kotlinx.coroutines.flow.onEach
 class ResultsFragment : Fragment() {
 
 
+    private var _binding: ResultsFragmentBinding? = null
+    private val binding get() = _binding!!
+
+
     private val viewModel: ResultsViewModel by viewModels()
-    private val adapter: ResultsAdapter? get() = views { resultsRv.adapter as? ResultsAdapter }
-    private var binding: ResultsFragmentBinding? = null
+    private val adapter: ResultsAdapter? get() = binding.resultsRv.adapter as? ResultsAdapter
 
 
     override fun onCreateView(
 
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View = ResultsFragmentBinding.inflate(inflater).also { binding = it }.root
+    ): View {
+        _binding = ResultsFragmentBinding.inflate(inflater, container, false)
+        return binding.root
+    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        views {
-            resultsRv.adapter = context?.let { ResultsAdapter(it) }
-
-        }
+        binding.resultsRv.adapter = context?.let { ResultsAdapter(it) }
         viewModel.getResults().onEach(::render).launchIn(lifecycleScope)
 
     }
 
     override fun onDestroy() {
         super.onDestroy()
-        binding = null
+        _binding = null
     }
 
     private fun render(participant: List<Participant>) {
         adapter?.submitList(participant)
     }
 
-    private fun <T> views(block: ResultsFragmentBinding.() -> T): T? = binding?.block()
 }

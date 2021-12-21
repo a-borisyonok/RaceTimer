@@ -11,11 +11,14 @@ class Repository @Inject constructor(
 
     ) {
 
-
     fun getAll(): Flow<List<Participant>> = dao.getAll()
+
     fun getResults(): Flow<List<Participant>> = dao.getResults()
+
     suspend fun create(participant: Participant) = dao.add(participant)
+
     suspend fun start(startTime: Long, id: Int) = dao.setStartTime(startTime, id)
+
     suspend fun finish(finishTime: Long, raceTime: Long, id: Int) =
         dao.setFinishTime(finishTime, raceTime, id)
 

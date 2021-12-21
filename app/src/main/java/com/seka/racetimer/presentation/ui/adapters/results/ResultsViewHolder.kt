@@ -27,7 +27,7 @@ class ResultsViewHolder @Inject constructor(
         this.item = item
         this.adapter = ResultsAdapter(context)
 
-        views {
+        with(binding) {
             startNumber.text = item.startNumber.toString()
             when {
                 item.startTime == 0L -> setVisibilityWhenDNS()
@@ -39,7 +39,7 @@ class ResultsViewHolder @Inject constructor(
 
     private fun setVisibilityWhenDNS() {
 
-        views {
+        with(binding) {
             resultStartTime.text = context.getString(R.string.dns_text)
             resultFinishTime.text = ""
             resultDnsText.visibility = View.VISIBLE
@@ -48,7 +48,8 @@ class ResultsViewHolder @Inject constructor(
     }
 
     private fun setVisibilityWhenDNF(item: Participant) {
-        views {
+
+        with(binding){
             resultStartTime.text = convertMillisToTime(item.startTime)
             resultFinishTime.text = context.getString(R.string.dnf_text)
             resultDnfText.visibility = View.VISIBLE
@@ -56,13 +57,16 @@ class ResultsViewHolder @Inject constructor(
     }
 
     private fun setVisibilityWhenOK(item: Participant) {
-        views {
+
+        with(binding) {
             position.visibility = View.VISIBLE
             raceTime.visibility = View.VISIBLE
             raceTimeText.visibility = View.VISIBLE
+
             resultStartTime.text = convertMillisToTime(item.startTime)
             resultFinishTime.text = convertMillisToTime(item.finishTime)
             raceTime.text = convertRaceDurationToTime(item.raceTime)
+
             position.visibility = View.VISIBLE
             position.text = (adapterPosition + 1).toString()
         }
@@ -74,7 +78,6 @@ class ResultsViewHolder @Inject constructor(
         TimeMillisConverter().convertRaceDurationToTime(duration)
 
 
-    private fun <T> views(block: ParticipantResultBinding.() -> T): T? = binding.block()
 
 }
 

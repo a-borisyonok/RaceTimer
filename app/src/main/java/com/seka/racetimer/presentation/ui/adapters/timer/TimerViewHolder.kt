@@ -2,7 +2,6 @@ package com.seka.racetimer.presentation.ui.adapters.timer
 
 import android.content.Context
 import android.content.SharedPreferences
-import android.util.Log
 import android.view.View
 import androidx.lifecycle.viewModelScope
 import androidx.recyclerview.widget.RecyclerView
@@ -20,10 +19,7 @@ import dagger.hilt.InstallIn
 import dagger.hilt.android.EntryPointAccessors
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.cancel
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
 import javax.inject.Inject
 
 
@@ -41,15 +37,17 @@ class TimerViewHolder @Inject constructor(
 
     }
 
+
     private val useCase: TimerUseCase =
         EntryPointAccessors.fromApplication(context, Injection::class.java)
             .getUseCase()
 
+
     private val sharedPreferences: SharedPreferences =
         EntryPointAccessors.fromApplication(context, Injection::class.java).getSharedPreferences()
 
-    private val _viewModel: TimerViewModel = TimerViewModel(useCase)
-    private var viewModel = _viewModel
+
+    private var viewModel: TimerViewModel = TimerViewModel(useCase)
     private var adapter: TimerAdapter? = TimerAdapter(context)
     private var item: Participant? = null
 
@@ -62,18 +60,46 @@ class TimerViewHolder @Inject constructor(
         this.viewModel = TimerViewModel(useCase)
         this.adapter = TimerAdapter(context)
 
+        setStartButtonVisibility()
+
+        val dnsJob = setVisibilityIfDNS(item)
+        val dnfJob = setVisibilityIfDNF(item)
+
+        with(binding) {
+
+            startNumber.text = item.startNumber.toString()
+
+            if (item.startTime > 0) {
+                dnsJob.cancel()
+                setVisibilityWhenStarted()
+                participantStartTime.text = convertMillisToTime(item.startTime)
+            }
+            if (item.finishTime > 0) {
+                dnfJob.cancel()
+                setVisibilityWhenFinished()
+                participantFinishTime.text = convertMillisToTime(item.finishTime)
+            }
+
+            startButton.setOnClickListener {
+                dnsJob.cancel()
+                checkStart(item)
+            }
+
+            finishButton.setOnClickListener {
+                dnfJob.cancel()
+                checkFinish(item)
+            }
+        }
+    }
+
+    private fun setStartButtonVisibility() {
         val startOpeningTime = sharedPreferences.getLong(START_OPENING, 0)
-        val startClosingTime = sharedPreferences.getLong(START_CLOSING, 0)
-        val finishClosingTime = sharedPreferences.getLong(FINISH_CLOSING, 0)
-
-        views {
-
-
+        with(binding) {
             viewModel.viewModelScope.launch {
                 while (true) {
                     if (startOpeningTime > System.currentTimeMillis()) {
                         startButton.isEnabled = false
-                        Log.i("test disabled button", startButton.isEnabled.toString())
+
                     } else {
                         startButton.isEnabled = true
                         startButton.setBackgroundColor(context.getColor(R.color.start_button_color))
@@ -82,66 +108,20 @@ class TimerViewHolder @Inject constructor(
                     delay(1000)
                 }
             }
-
-            val dnsJob = viewModel.viewModelScope.launch(Dispatchers.IO) {
-                while (true) {
-
-                    if (item.startTime == 0L && System.currentTimeMillis() >= startClosingTime) {
-                        viewModel.viewModelScope.launch(Dispatchers.Main) { setVisibilityWhenDNS() }
-                        viewModel.finish(item.id, 0, Long.MAX_VALUE)
-                        cancel()
-
-                    }
-                    delay(1000)
-                }
-            }
-            val dnfJob = viewModel.viewModelScope.launch(Dispatchers.IO) {
-                while (true) {
-
-                    if (item.startTime > 0 && item.finishTime == 0L && System.currentTimeMillis() >= finishClosingTime) {
-                        viewModel.viewModelScope.launch(Dispatchers.Main) { setVisibilityWhenDNF() }
-                        viewModel.finish(item.id, 0, Long.MAX_VALUE - 1L)
-                        cancel()
-                    }
-                    delay(1000)
-                }
-            }
-
-            startNumber.text = item.startNumber.toString()
-
-
-
-            if (item.startTime > 0) {
-                setVisibilityWhenStarted()
-                participantStartTime.text = convertMillisToTime(item.startTime)
-            }
-            if (item.finishTime > 0) {
-                setVisibilityWhenFinished()
-                participantFinishTime.text = convertMillisToTime(item.finishTime)
-            }
-
-            startButton.setOnClickListener {
-                dnsJob.cancel()
-                val checkedStartTimeInMillis = System.currentTimeMillis()
-                viewModel.start(item.id, checkedStartTimeInMillis)
-                setVisibilityWhenStarted()
-                participantStartTime.text = convertMillisToTime(checkedStartTimeInMillis)
-            }
-
-            finishButton.setOnClickListener {
-                dnfJob.cancel()
-                val checkedFinishTimeInMillis = System.currentTimeMillis()
-                val raceTime = checkedFinishTimeInMillis - item.startTime
-                viewModel.finish(item.id, checkedFinishTimeInMillis, raceTime)
-                setVisibilityWhenFinished()
-                participantFinishTime.text = convertMillisToTime(checkedFinishTimeInMillis)
-            }
         }
     }
 
+    private fun checkStart(item: Participant) {
+
+        val checkedStartTimeInMillis = System.currentTimeMillis()
+        viewModel.start(item.id, checkedStartTimeInMillis)
+        setVisibilityWhenStarted()
+        binding.participantStartTime.text = convertMillisToTime(checkedStartTimeInMillis)
+    }
 
     private fun setVisibilityWhenStarted() {
-        views {
+
+        with(binding) {
             startButton.visibility = View.GONE
             participantStartTime.visibility = View.VISIBLE
             participantStartTimeHint.visibility = View.VISIBLE
@@ -150,8 +130,18 @@ class TimerViewHolder @Inject constructor(
         }
     }
 
+    private fun checkFinish(item: Participant) {
+
+        val checkedFinishTimeInMillis = System.currentTimeMillis()
+        val raceTime = checkedFinishTimeInMillis - item.startTime
+        viewModel.finish(item.id, checkedFinishTimeInMillis, raceTime)
+        binding.participantFinishTime.text = convertMillisToTime(checkedFinishTimeInMillis)
+        setVisibilityWhenFinished()
+    }
+
     private fun setVisibilityWhenFinished() {
-        views {
+
+        with(binding) {
             finishButton.visibility = View.GONE
             participantFinishTime.visibility = View.VISIBLE
             participantFinishTimeHint.visibility = View.VISIBLE
@@ -159,29 +149,64 @@ class TimerViewHolder @Inject constructor(
         }
     }
 
-    private fun setVisibilityWhenDNS() {
-        views {
-            startButton.visibility = View.GONE
-            dnsText.visibility = View.VISIBLE
-            participantStartTime.visibility = View.GONE
-            participantStartTimeHint.visibility = View.GONE
-            participantFinishTimeHint.visibility = View.GONE
-            participantFinishTime.visibility = View.GONE
+    private fun setVisibilityIfDNS(item: Participant): Job {
 
+        val startClosingTime = sharedPreferences.getLong(START_CLOSING, 0)
+
+        return with(binding) {
+
+            viewModel.viewModelScope.launch(Dispatchers.IO) {
+                while (true) {
+
+                    if (item.startTime == 0L && System.currentTimeMillis() >= startClosingTime) {
+
+                        viewModel.viewModelScope.launch(Dispatchers.Main) {
+
+                            startButton.visibility = View.GONE
+                            dnsText.visibility = View.VISIBLE
+                            participantStartTime.visibility = View.GONE
+                            participantStartTimeHint.visibility = View.GONE
+                            participantFinishTimeHint.visibility = View.GONE
+                            participantFinishTime.visibility = View.GONE
+                            finishButton.visibility = View.GONE
+                        }
+
+                        viewModel.finish(item.id, 0, Long.MAX_VALUE)
+                        cancel()
+
+                    }
+                    delay(1000)
+                }
+            }
         }
     }
 
-    private fun setVisibilityWhenDNF() {
-        views {
-            finishButton.visibility = View.GONE
-            dnfText.visibility = View.VISIBLE
-            participantFinishTime.visibility = View.GONE
-            participantFinishTimeHint.visibility = View.GONE
+    private fun setVisibilityIfDNF(item: Participant): Job {
+
+        val finishClosingTime = sharedPreferences.getLong(FINISH_CLOSING, 0)
+
+        return with(binding) {
+
+            viewModel.viewModelScope.launch(Dispatchers.IO) {
+
+                while (true) {
+
+                    if (item.startTime > 0 && item.finishTime == 0L && System.currentTimeMillis() >= finishClosingTime) {
+
+                        viewModel.viewModelScope.launch(Dispatchers.Main) {
+
+                            finishButton.visibility = View.GONE
+                            dnfText.visibility = View.VISIBLE
+                            participantFinishTime.visibility = View.GONE
+                            participantFinishTimeHint.visibility = View.GONE
+                        }
+                        viewModel.finish(item.id, 0, Long.MAX_VALUE - 1L)
+                        cancel()
+                    }
+                    delay(1000)
+                }
+            }
         }
     }
-
-
-    private fun <T> views(block: PatricipantTimerBinding.() -> T): T? = binding.block()
-
 }
 

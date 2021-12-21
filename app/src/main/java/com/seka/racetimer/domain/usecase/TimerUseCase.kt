@@ -11,8 +11,11 @@ class TimerUseCase @Inject constructor(
 
 
     suspend fun create(participant: Participant) = repository.create(participant)
+
     fun getAll(): Flow<List<Participant>> = repository.getAll()
+
     suspend fun start(id: Int, startTime: Long) = repository.start(startTime, id)
+
     suspend fun finish(id: Int, finishTime: Long, raceTime: Long) =
         repository.finish(finishTime, raceTime, id)
 

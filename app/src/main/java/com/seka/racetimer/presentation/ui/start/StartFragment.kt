@@ -19,7 +19,9 @@ import javax.inject.Inject
 @AndroidEntryPoint
 class StartFragment : Fragment() {
 
-    private var binding: FragmentStartBinding? = null
+    private var _binding: FragmentStartBinding? = null
+    private val binding get() = _binding!!
+
 
     @Inject
     lateinit var sharedPreferences: SharedPreferences
@@ -32,11 +34,14 @@ class StartFragment : Fragment() {
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View = FragmentStartBinding.inflate(inflater).also { binding = it }.root
+    ): View {
+        _binding = FragmentStartBinding.inflate(inflater)
+        return binding.root
+    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        views {
+        with(binding) {
 
             prefsButton.setOnClickListener {
                 view.findNavController().navigate(R.id.action_startFragment_to_settingsFragment)
@@ -45,11 +50,6 @@ class StartFragment : Fragment() {
                 view.findNavController().navigate(R.id.action_startFragment_to_timerFragment)
             }
         }
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        binding = null
     }
 
     private fun setUITheme() {
@@ -76,7 +76,10 @@ class StartFragment : Fragment() {
         }
     }
 
-    private fun <T> views(block: FragmentStartBinding.() -> T): T? = binding?.block()
+    override fun onDestroy() {
+        super.onDestroy()
+        _binding = null
+    }
 }
 
 

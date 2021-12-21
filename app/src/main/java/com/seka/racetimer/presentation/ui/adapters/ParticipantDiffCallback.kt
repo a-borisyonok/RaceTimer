@@ -11,6 +11,4 @@ class ParticipantDiffCallback  : DiffUtil.ItemCallback<Participant>() {
        return oldItem == newItem
 
     }
-
-
 }

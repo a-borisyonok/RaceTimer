@@ -16,7 +16,6 @@ import com.seka.racetimer.other.FINISH_CLOSING
 import com.seka.racetimer.other.START_CLOSING
 import com.seka.racetimer.other.START_OPENING
 import com.seka.racetimer.other.THEME_PREFERENCES
-import com.seka.racetimer.util.TimePickerDialog
 import com.seka.racetimer.util.*
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.delay
@@ -28,55 +27,33 @@ class SettingsFragment : Fragment() {
     @Inject
     lateinit var sharedPreferences: SharedPreferences
 
-    private var binding: SettingsFragmentBinding? = null
+    private var _binding: SettingsFragmentBinding? = null
+    private val binding get() = _binding!!
+
     private var preferenceKey: String = ""
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View = SettingsFragmentBinding.inflate(inflater).also { binding = it }.root
+    ): View {
+        _binding = SettingsFragmentBinding.inflate(inflater, container, false)
+        return binding.root
+    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         val preferredTheme = sharedPreferences.getString(THEME_PREFERENCES, "")
-        if (preferredTheme == "night") {
-            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
-        } else {
-            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
-        }
-        views {
-            lifecycleScope.launchWhenStarted {
-                while (true) {
-                    val startOpeningTime = sharedPreferences.getLong(START_OPENING, 0)
-                    startOpenTime.text = convertMillisToTime(startOpeningTime)
-                    val startClosingTime = sharedPreferences.getLong(START_CLOSING, 0)
-                    startCloseTime.text = convertMillisToTime(startClosingTime)
-                    val finishClosingTime = sharedPreferences.getLong(FINISH_CLOSING, 0)
-                    finishCloseTime.text = convertMillisToTime(finishClosingTime)
-                    delay(500)
-                }
-            }
+
+        with(binding) {
+            setTimeText()
 
             if (preferredTheme == "night") toggleTheme.isChecked = true
             theme.text = getString(R.string.dark_mode_text)
 
             toggleTheme.setOnClickListener {
-
-                when (resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK) {
-                    Configuration.UI_MODE_NIGHT_YES -> {
-
-                        AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
-                        toggleTheme.isActivated = true
-                        sharedPreferences.edit().putString(THEME_PREFERENCES, "day").apply()
-                    }
-                    Configuration.UI_MODE_NIGHT_NO -> {
-
-                        AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
-                        toggleTheme.isActivated = false
-                        sharedPreferences.edit().putString(THEME_PREFERENCES, "night").apply()
-                    }
-                }
+                setTheme()
             }
+
             editOpenTime.setOnClickListener {
                 preferenceKey = START_OPENING
                 showTimePicker()
@@ -91,12 +68,44 @@ class SettingsFragment : Fragment() {
                 preferenceKey = FINISH_CLOSING
                 showTimePicker()
             }
+
             startTimerFromSettings.setOnClickListener {
                 view.findNavController().navigate(R.id.action_settingsFragment_to_timerFragment)
             }
         }
     }
 
+    private fun setTheme() {
+        when (resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK) {
+
+            Configuration.UI_MODE_NIGHT_YES -> {
+
+                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
+                binding.toggleTheme.isActivated = true
+                sharedPreferences.edit().putString(THEME_PREFERENCES, "day").apply()
+            }
+            Configuration.UI_MODE_NIGHT_NO -> {
+
+                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
+                binding.toggleTheme.isActivated = false
+                sharedPreferences.edit().putString(THEME_PREFERENCES, "night").apply()
+            }
+        }
+    }
+
+    private fun setTimeText() {
+        lifecycleScope.launchWhenStarted {
+            while (true) {
+                val startOpeningTime = sharedPreferences.getLong(START_OPENING, 0)
+                binding.startOpenTime.text = convertMillisToTime(startOpeningTime)
+                val startClosingTime = sharedPreferences.getLong(START_CLOSING, 0)
+                binding.startCloseTime.text = convertMillisToTime(startClosingTime)
+                val finishClosingTime = sharedPreferences.getLong(FINISH_CLOSING, 0)
+                binding.finishCloseTime.text = convertMillisToTime(finishClosingTime)
+                delay(500)
+            }
+        }
+    }
 
     private fun convertMillisToTime(time: Long) = TimeMillisConverter().convertMillisToTime(time)
 
@@ -109,9 +118,6 @@ class SettingsFragment : Fragment() {
 
     override fun onDestroy() {
         super.onDestroy()
-        binding = null
+        _binding = null
     }
-
-
-    private fun <T> views(block: SettingsFragmentBinding.() -> T): T? = binding?.block()
 }

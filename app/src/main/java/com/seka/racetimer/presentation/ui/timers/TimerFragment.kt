@@ -11,8 +11,8 @@ import androidx.navigation.findNavController
 import com.seka.racetimer.R
 import com.seka.racetimer.databinding.TimerFragmentBinding
 import com.seka.racetimer.domain.model.Participant
-import com.seka.racetimer.util.Dialogs
 import com.seka.racetimer.presentation.ui.adapters.timer.TimerAdapter
+import com.seka.racetimer.util.Dialogs
 import com.seka.racetimer.util.TimeMillisConverter
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.delay
@@ -22,22 +22,25 @@ import kotlinx.coroutines.flow.onEach
 @AndroidEntryPoint
 class TimerFragment : Fragment() {
 
+    private var _binding: TimerFragmentBinding? = null
+    private val binding get() = _binding!!
 
     private val viewModel: TimerViewModel by viewModels()
-    private val adapter: TimerAdapter? get() = views { recyclerView.adapter as? TimerAdapter }
-    private var binding: TimerFragmentBinding? = null
-
+    private val adapter: TimerAdapter? get() = binding.recyclerView.adapter as? TimerAdapter
 
     override fun onCreateView(
 
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View = TimerFragmentBinding.inflate(inflater).also { binding = it }.root
+    ): View {
+        _binding = TimerFragmentBinding.inflate(inflater, container, false)
+        return binding.root
+    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        views {
+        with(binding) {
 
             viewLifecycleOwner.lifecycleScope.launchWhenStarted {
                 while (true) {
@@ -60,19 +63,17 @@ class TimerFragment : Fragment() {
                 }
             }
             deleteAllButton.setOnClickListener {
-                Dialogs().showDeleteAllDialog(requireContext(), viewModel, view)
+                context?.let { it1 -> Dialogs().showDeleteAllDialog(it1, viewModel, view) }
             }
+
             goToResults.setOnClickListener {
                 view.findNavController().navigate(R.id.action_timerFragment_to_resultsFragment)
             }
         }
+
         viewModel.getParticipants().onEach(::render).launchIn(lifecycleScope)
     }
 
-    override fun onDestroy() {
-        super.onDestroy()
-        binding = null
-    }
 
     private fun convertMillisToTime(millis: Long) =
         TimeMillisConverter().convertMillisToTime(millis)
@@ -82,5 +83,8 @@ class TimerFragment : Fragment() {
         adapter?.submitList(participant)
     }
 
-    private fun <T> views(block: TimerFragmentBinding.() -> T): T? = binding?.block()
+    override fun onDestroy() {
+        super.onDestroy()
+        _binding = null
+    }
 }

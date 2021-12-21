@@ -15,6 +15,7 @@ import javax.inject.Inject
 
 class TimerAdapter @Inject constructor(@ApplicationContext private val context: Context) :
     ListAdapter<Participant, TimerViewHolder>(ParticipantDiffCallback()) {
+
     override fun getItemId(position: Int): Long {
         return position.toLong()
     }
